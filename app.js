@@ -40,20 +40,41 @@ class UI {
     }
 
     //Eliminar producto
-    deleteProduct() {
+    deleteProduct(element) {
 
+        //Validación para eliminar producto
+        if(element.name === 'delete'){
+            element.parentElement.parentElement.parentElement.remove();
+            this.showMessage('Producto eliminado exitosamente','warning');
+        }
     }
 
-    //Listar productos
-    showMessage() {
+    //Para consultar si agrega o elimina elementos dentro de la interfaz.
+    showMessage(message, cssClass) {
 
+        //crear div
+        const div = document.createElement('div');
+        div.className = `alert alert-${cssClass} mt-4`;
+        div.appendChild(document.createTextNode(message));
+
+        //Mostrar mensaje en html
+        const container = document.querySelector('.container');
+        const app = document.querySelector('#app');
+
+        //Texto a mostrar, antes del elemento container
+        container.insertBefore(div, app);
+        //Temporizador para sacar elemento del html. 1er parametro function a realizar y 2do el temporizador en milisegundos.
+        setTimeout(()=>{
+            //Elemento a remover
+            document.querySelector('.alert').remove();
+        },2000)
     }
 }
 
 //Eventos del DOM
 
 //Captura de btn submit
-document.getElementById('product-form').addEventListener('submit', function (e) {
+document.getElementById('product-form').addEventListener('submit', (e)=> {
     //Capturamos los valores del form.
     const name = document.getElementById('name').value;
     const price = document.getElementById('price').value;
@@ -61,11 +82,18 @@ document.getElementById('product-form').addEventListener('submit', function (e) 
 
     //crear objeto producto
     const product = new Product(name, price, year);
-    console.log(product);
+    //console.log(product);
 
     //Crea instancia ui para acceder a metodo agregar producto
     const ui = new UI();
+
+    //Alertas por si faltan campos a llenar.
+    if(name ==='' || price === '' || year ===''){
+        return ui.showMessage('Completar formulario','danger');
+    }
     ui.addProduct(product);
+    ui.resetForm();
+    ui.showMessage('Producto agregado satisfactoriamente','success');
 
     //Para detener evento de que se refresque la pantalla al enviar
     e.preventDefault();
@@ -73,5 +101,6 @@ document.getElementById('product-form').addEventListener('submit', function (e) 
 
 //Capturar boton delete
 document.getElementById('product-list').addEventListener('click',(e)=>{
-    console.log(e.target);
+    const ui = new UI();
+    ui.deleteProduct(e.target);
 })
